@@ -1,0 +1,32 @@
+*filter
+
+
+# disallow all traffic by default
+-P INPUT DROP
+-P FORWARD DROP
+-P OUTPUT DROP
+
+# only allow inbound traffic from established or related connections
+-A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+
+
+# allow the loopback interface and ping.
+-A OUTPUT -o lo -j ACCEPT
+-A OUTPUT -o tun0 -p icmp -j ACCEPT
+
+# Allow DNS servers
+-A OUTPUT -d 1.1.1.1 -j ACCEPT
+-A OUTPUT -d 8.8.8.8 -j ACCEPT
+
+
+# Allow LAN traffic
+-A INPUT -s 192.168.0.0/24 -j ACCEPT
+-A OUTPUT -d 192.168.0.0/24 -j ACCEPT
+
+
+# Allow VPN itself
+
+-A OUTPUT -p udp -m udp --dport 1194 -j ACCEPT
+-A OUTPUT -o tun0 -j ACCEPT
+
+COMMIT
